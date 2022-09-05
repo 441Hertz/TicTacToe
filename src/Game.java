@@ -89,10 +89,18 @@ public class Game {
         return isWon() || isFull();
     }
 
+    public void playYourTurn(String pos){
+        playYourTurn(Integer.parseInt(pos));
+    }
+    
     public void playYourTurn(int pos){
         if (board[Math.floorDiv(pos, 3)][pos % 3] == 0){
             board[Math.floorDiv(pos, 3)][pos % 3] = id;
         } 
+    }
+
+    public void playTheirTurn(String pos){
+        playTheirTurn(Integer.parseInt(pos));
     }
 
     public void playTheirTurn(int pos){
@@ -151,5 +159,35 @@ public class Game {
         System.out.println("1. HOST MOVES FIRST");
         System.out.println("2. ENTER INT TO MOVE (SEE BOARD BELOW)");
         this.printRulesBoard();
-    }   
+    }
+    
+    public boolean isValidMove(String move){
+        if (!isInteger(move)){
+            System.out.print("Enter an integer: ");
+            return false;
+        }
+        try{
+            int pos = Integer.parseInt(move);
+            if (board[Math.floorDiv(pos, 3)][pos % 3] == 0){
+                return true;
+            }
+        } catch (ArrayIndexOutOfBoundsException e){
+        } 
+        System.out.print("Enter valid move: ");
+        return false;
+
+    }
+
+    public static boolean isInteger(String numStr){
+        if (numStr == null){
+            return false;
+        }
+        try{
+            int i = Integer.parseInt(numStr);
+        }
+        catch (NumberFormatException e){
+            return false;
+        }
+        return true;
+    }
 }

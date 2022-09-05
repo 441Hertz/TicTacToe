@@ -78,7 +78,7 @@ public class Main {
     }
     
     public static void playGame() throws IOException{
-        int input;
+        String input = null;
         int response;
         game.rules();
         game.printBoard();
@@ -86,13 +86,17 @@ public class Main {
         System.out.format("You are %s.%n", name);
 
         if (isHost()){
-            System.out.format("Your move: ");
-            input = server.readInputMove();
+            System.out.print("Your move: ");
+            do{
+                input = server.readInput();
+            } while(!game.isValidMove(input));
+            
             game.playYourTurn(input);
             game.printBoard();
             server.send(input);
         }
-        System.out.format("Waiting for %s to move...%n", name);
+
+        System.out.format("Waiting for %s to move...%n", name); // wait for opponent
 
         while (!game.isOver()){
             if (isHost()){
@@ -115,11 +119,17 @@ public class Main {
 
             System.out.print("Your move: ");
             if (isHost()){
-                input = server.readInputMove();
+                do{
+                    input = server.readInput();
+                } while(!game.isValidMove(input));
+                
                 server.send(input);
-            }
+                }
             else{
-                input = client.readInputMove();
+                do{
+                    input = client.readInput();
+                } while(!game.isValidMove(input));
+                
                 client.send(input);
             }
 
@@ -148,4 +158,6 @@ public class Main {
     public static boolean isHost(){
         return server != null;
     }
+
+    
 }
