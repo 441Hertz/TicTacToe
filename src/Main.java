@@ -2,10 +2,11 @@ import java.io.IOException;
 import java.util.Scanner;
 // TODO rename server
 public class Main {
-    public static TTTServer server = null;
-    public static TTTClient client = null;
+    public static P2P p2p = null;
     public static Game game;
-    public static String name;
+    public static String[] name;
+    public static final String divider = "=========================================";
+
     public static void main(String[] args) throws IOException, InterruptedException{
         init(args);
     }
@@ -52,112 +53,158 @@ public class Main {
         }
     }
 
-    // game code repeats. same method to handle? could have a variable hold the server or client. 
-    // could have print statements that print depending on client or server (via fields or argument)
-    // or have wrapper method
     public static void host(int portNumber) throws IOException {
-        server = new TTTServer(portNumber);
-        
-        name = "[Host]";
         game = new Game('H');
+        
+        p2p = new P2P(portNumber);
+        
+        name = new String[] {"[Host]", "[Client]"};
 
+        pickMarker();
         playGame();
     }
 
     public static void connect(String hostName, int portNumber) throws IOException, InterruptedException {
-        client = new TTTClient(hostName, portNumber);
-
-        name = "[Client]";
         game = new Game('C');
+        
+        p2p = new P2P(hostName, portNumber);
 
+        name = new String[] {"[Client]", "[Host]"};
+
+        pickMarker();
         playGame();
     }
 
-    public static void pickMarker(){
-        // bufferedreader to get input
-    }
-    
     public static void playGame() throws IOException{
         String input = null;
         int response;
-        game.rules();
+
+        System.out.format("You are %s.%n", name[0]);
+        System.out.println(divider);
+
         game.printBoard();
 
-        System.out.format("You are %s.%n", name);
-
         if (isHost()){
+            System.out.println(divider);
             System.out.print("Your move: ");
             do{
-                input = server.readInput();
+                input = p2p.readInput();
             } while(!game.isValidMove(input));
             
             game.playYourTurn(input);
             game.printBoard();
-            server.send(input);
+            p2p.send(input);
         }
 
-        System.out.format("Waiting for %s to move...%n", name); // wait for opponent
+        System.out.println(divider);
+        System.out.format("Waiting for %s to move...%n", name[1]);
 
         while (!game.isOver()){
-            if (isHost()){
-                response = server.receiveMove();
-            }
-            else{
-                response = client.receiveMove();
-            }
+            response = p2p.receiveMove(); // works? bc they send int?
 
             game.playTheirTurn(response);
             game.printBoard();
 
             if (game.isWon()){
                 System.out.println("you lost");
+                System.out.println(divider);
                 break;
+
             }
             else if (game.isDraw()){
+                System.out.println(divider);
                 break;
+
             }
 
+            System.out.println(divider);
+
             System.out.print("Your move: ");
-            if (isHost()){
-                do{
-                    input = server.readInput();
-                } while(!game.isValidMove(input));
-                
-                server.send(input);
-                }
-            else{
-                do{
-                    input = client.readInput();
-                } while(!game.isValidMove(input));
-                
-                client.send(input);
-            }
+            
+            do{
+                input = p2p.readInput();
+            } while(!game.isValidMove(input));
+            
+            p2p.send(input);
 
             game.playYourTurn(input);
             game.printBoard();
 
             if (game.isWon()){
                 System.out.println("you won");
+                System.out.println(divider);
                 break;
             }
             else if (game.isDraw()){
-
+                System.out.println("draw");
+                System.out.println(divider);
+                break;
             }
-
-            System.out.format("Waiting for %s to move...%n", name);
+            
+            System.out.println(divider);
+            System.out.format("Waiting for %s to move...%n", name[0]);
         }
     }
 
+    public static boolean isHost(){
+        return name[0].equals("[Host]");
+    }
 
+    public static void rematch(){
+        
+    }
+    public static void pickMarker() throws IOException{
+        String input;
+        String output; 
+        System.out.println("Choose a char to be your marker (symbol).");
+
+        if (isHost()){
+            System.out.print("Your marker: ");
+            input = p2p.readInput();
+
+            while(!game.isChar(input)){
+                System.out.print("Enter char marker: ");
+                input = p2p.readInput();
+            }
+
+            game.setYourMarker(input);
+            p2p.send(input);
+
+            System.out.format("%s picking marker...%n", name[1]); // same
+            output = p2p.receive();
+            game.setTheirMarker(output);
+            System.out.format("%1$s picked '%1$s'.%n", name[1], output); // same
+
+        } else {
+            System.out.format("%s picking marker...%n", name[1]); // same
+            output = p2p.receive();
+            game.setTheirMarker(output);
+            System.out.format("%1$s picked '%2$s', choose your marker: ", name[1], output); // same
+
+            input = p2p.readInput();
+            
+            while (true){
+                if (!game.isChar(input)){
+                    System.out.print("Enter char marker: ");
+                    input = p2p.readInput();
+                }
+                else if (!game.isValidMarker(input)){
+                    System.out.print("Enter unique marker: ");
+                    input = p2p.readInput();
+                }
+                else{
+                    break;
+                }
+            }
+
+            game.setYourMarker(input);
+            p2p.send(input);
+        }
+    }
+    
     public static void quit(){
-        // TODO 
+        // TODO
         // Go down a level of prompts (changing from connecting to host)
         // Stay in loop forever despite exceptions
     }
-
-    public static boolean isHost(){
-        return server != null;
-    }
-
-    
 }

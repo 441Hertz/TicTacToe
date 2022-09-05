@@ -5,9 +5,17 @@ public class P2P {
     private PrintWriter sender; 
     private BufferedReader receiver;
     private BufferedReader stdIn;
-    public P2P(){
-
+    
+    public P2P(int portNumber) throws IOException{
+        TTTServer server = new TTTServer(portNumber);
+        createStreams(server.socket);
     }
+
+    public P2P(String hostName, int portNumber) throws InterruptedException, IOException{
+        TTTClient client = new TTTClient(hostName, portNumber);
+        createStreams(client.socket);
+    }
+
     public void createStreams(Socket socket) throws IOException {
         this.sender = new PrintWriter(socket.getOutputStream(), true);
         this.receiver = new BufferedReader(new InputStreamReader(socket.getInputStream()));

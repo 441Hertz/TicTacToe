@@ -1,8 +1,6 @@
-import java.util.Arrays;
-
 public class Game {
-    private static int id = 1;
-    private static char marker = 'X';
+    private static char yourMarker;
+    private static char theirMarker;
     public static int[][] board;
     // should be final - client always is 1, server is 2
     // tests
@@ -14,14 +12,46 @@ public class Game {
     }
     
     public Game(){
-        this(marker);
+        this('X');
     }
     
     public Game(char symbol){
-        marker = symbol;
+        this(symbol, 'O');
+    }
+
+    public Game(char yourSymbol, char theirSymbol){
+        yourMarker = yourSymbol;
+        theirMarker = theirSymbol;
         this.newBoard();
+        this.rules();
     }
     
+    public boolean isValidMarker(String marker){
+        return isValidMarker(marker.charAt(0));
+    }
+    public boolean isValidMarker(char marker){
+        return marker != theirMarker;
+    }
+
+    public void setYourMarker(String symbol){
+        setYourMarker(symbol.charAt(0));
+    }
+    public void setYourMarker(char symbol){
+        yourMarker = symbol;
+    }
+
+    public void setTheirMarker(String symbol){
+        setTheirMarker(symbol.charAt(0));
+    }
+
+    public void setTheirMarker(char symbol){
+        if (yourMarker != symbol){
+            theirMarker = symbol;
+        } else {
+            System.out.print("Marker in use. Enter new marker: "); // this doesnt actually happen since we check if it works first
+        }
+    }
+
     public void newBoard(){
         board = new int[3][3];
     }
@@ -95,7 +125,7 @@ public class Game {
     
     public void playYourTurn(int pos){
         if (board[Math.floorDiv(pos, 3)][pos % 3] == 0){
-            board[Math.floorDiv(pos, 3)][pos % 3] = id;
+            board[Math.floorDiv(pos, 3)][pos % 3] = 1;
         } 
     }
 
@@ -119,13 +149,13 @@ public class Game {
         for (int[] row : board){
             for (int value : row){
                 if (value == 1){
-                    System.out.print(marker);
+                    System.out.format("%s ", yourMarker);
                 }
                 else if (value == -1){
-                    System.out.print("O");
+                    System.out.format("%s ", theirMarker);
                 }
                 else{
-                    System.out.print("_");
+                    System.out.print("_ ");
                 }
                 if (count % 3 == 0){
                     System.out.println("");
@@ -142,7 +172,7 @@ public class Game {
         System.out.println("");
         for (int[] row : rulesBoard){
             for (int value : row){
-                System.out.print(value);
+                System.out.format("%d ", value);
                 if (count % 3 == 0){
                     System.out.println("");
                 }
@@ -151,13 +181,15 @@ public class Game {
         }
         System.out.println("");
     }
+    
     public void rules(){
         System.out.println("-----------");
         System.out.println("TIC TAC TOE");
         System.out.println("-----------");
         System.out.println("RULES");
         System.out.println("1. HOST MOVES FIRST");
-        System.out.println("2. ENTER INT TO MOVE (SEE BOARD BELOW)");
+        System.out.println("2. CHOOSE A CHAR TYPE MARKER (SYMBOL) TO USE");
+        System.out.println("3. ENTER INT TO MOVE (SEE BOARD BELOW)");
         this.printRulesBoard();
     }
     
@@ -178,7 +210,7 @@ public class Game {
 
     }
 
-    public static boolean isInteger(String numStr){
+    public boolean isInteger(String numStr){
         if (numStr == null){
             return false;
         }
@@ -189,5 +221,9 @@ public class Game {
             return false;
         }
         return true;
+    }
+
+    public boolean isChar(String charStr){
+        return charStr.length() == 1;
     }
 }
