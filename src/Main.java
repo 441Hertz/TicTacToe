@@ -55,25 +55,30 @@ public class Main {
 
     public static void host(int portNumber) throws IOException {
         game = new Game('H');
-        
-        p2p = new P2P(portNumber);
-        
         name = new String[] {"[Host]", "[Client]"};
+        
+        try{
+            p2p = new P2P(portNumber);
+            pickMarker();
+            playGame();
+        } finally {
+            p2p.closeStreams();
+        }
 
-        pickMarker();
-        playGame();
     }
 
     public static void connect(String hostName, int portNumber) throws IOException, InterruptedException {
         game = new Game('C');
-        
-        p2p = new P2P(hostName, portNumber);
-
         name = new String[] {"[Client]", "[Host]"};
-
-        pickMarker();
-        playGame();
-    }
+        
+        try{
+            p2p = new P2P(hostName, portNumber);
+            pickMarker();
+            playGame();
+        } finally {
+            p2p.closeStreams();
+        }
+}
 
     public static void playGame() throws IOException{
         String input = null;
@@ -173,7 +178,7 @@ public class Main {
             System.out.format("%s picking marker...%n", name[1]); // same
             output = p2p.receive();
             game.setTheirMarker(output);
-            System.out.format("%1$s picked '%1$s'.%n", name[1], output); // same
+            System.out.format("%1$s picked '%2$s'.%n", name[1], output); // same
 
         } else {
             System.out.format("%s picking marker...%n", name[1]); // same

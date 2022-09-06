@@ -60,4 +60,10 @@ public class P2P {
     public void sendInput() throws IOException {
         send(this.stdIn.readLine());
     }
+
+    public void closeStreams() throws IOException{
+        this.sender.close();
+        this.receiver.close();
+        this.stdIn.close();
+    }
 }

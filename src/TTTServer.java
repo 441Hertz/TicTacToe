@@ -6,7 +6,9 @@ public class TTTServer {
 
     public TTTServer(int portNumber){
         try{
+            InetAddress inetAddress = InetAddress.getLocalHost();
             ServerSocket serverSocket = new ServerSocket(portNumber);
+            System.out.println("[Server] Opened at " + inetAddress.getHostAddress());
             System.out.println("[Server] Waiting for Client connection...");
             socket = serverSocket.accept();
             System.out.println("[Server] Connection established with Client.");
@@ -17,6 +19,10 @@ public class TTTServer {
                 + portNumber + " or listening for a connection");
             System.out.println(e.getMessage());
         }
+
+        // finally{
+        //     socket.close();
+        // }
         
     }
 }

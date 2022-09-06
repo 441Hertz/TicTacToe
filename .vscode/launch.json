@@ -31,13 +31,31 @@
             "request": "launch",
             "mainClass": "Main",
             "projectName": "TicTacToe_7c465d0d",
-            "args": ["localhost", "8888"]
+            "args": ["192.168.1.43", "8888"]
+        },{
+            "type": "java",
+            "name": "Launch Main Server No Args",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "TicTacToe_7c465d0d"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main Client No Args",
+            "request": "launch",
+            "mainClass": "Main",
+            "projectName": "TicTacToe_7c465d0d"
         }
     ],
     "compounds": [
         {
             "name": "Compound",
             "configurations": ["Launch Main Server", "Launch Main Client"]
+        },
+        {
+            "name": "NoArgs",
+            "configurations": ["Launch Main Server No Args", "Launch Main Client No Args"]
         }
-    ]
+    ],
+    
 }
