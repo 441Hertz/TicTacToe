@@ -1,6 +1,6 @@
 import java.io.IOException;
 import java.util.Scanner;
-// TODO rename server
+
 public class Main {
     public static P2P p2p = null;
     public static Game game;
@@ -105,18 +105,19 @@ public class Main {
         System.out.format("Waiting for %s to move...%n", name[1]);
 
         while (!game.isOver()){
-            response = p2p.receiveMove(); // works? bc they send int?
+            response = p2p.receiveMove(); 
 
             game.playTheirTurn(response);
             game.printBoard();
 
             if (game.isWon()){
-                System.out.println("you lost");
+                System.out.println("How do you even lose in tic tac toe LOL.");
                 System.out.println(divider);
                 break;
 
             }
             else if (game.isDraw()){
+                System.out.println("Stalemate.");
                 System.out.println(divider);
                 break;
 
@@ -136,12 +137,12 @@ public class Main {
             game.printBoard();
 
             if (game.isWon()){
-                System.out.println("you won");
+                System.out.println("Winner Winner Chicken Dinner!");
                 System.out.println(divider);
                 break;
             }
             else if (game.isDraw()){
-                System.out.println("draw");
+                System.out.println("Stalemate.");
                 System.out.println(divider);
                 break;
             }
@@ -158,6 +159,7 @@ public class Main {
     public static void rematch(){
         
     }
+
     public static void pickMarker() throws IOException{
         String input;
         String output; 
